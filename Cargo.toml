@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
+walkdir = "2"

@@ -1,10 +1,14 @@
 use orbtk::prelude::*;
-use orbtk::shell::prelude::{KeyEvent, Key};
+use orbtk::shell::prelude::{Key, KeyEvent};
+
 use std::process::exit;
+use walkdir::WalkDir;
 
 const FONT_SIZE: f32 = 28.0;
 const WIDTH: f32 = 1920.0;
 const HEIGHT: f32 = FONT_SIZE + 6.0;
+const SEARCH_ID: &str = "search_id";
+const ITEMS_ID: &str = "items_id";
 
 enum Message {
     Key(KeyEvent),
@@ -13,18 +17,46 @@ enum Message {
 #[derive(Default, AsAny)]
 struct MenuState {
     search: String,
+    items: Vec<String>,
     message: Option<Message>,
+    search_entity: Entity,
+    items_entity: Entity,
 }
 
 impl MenuState {
     fn send_message(&mut self, message: Message) {
         self.message = Some(message);
     }
+    fn render(&mut self, ctx: &mut Context) {
+        ctx.get_widget(self.search_entity).set::<String>("text", format!("{}|", self.search));
+    }
+    fn get_matches(&self) -> Vec<String> {
+        self.items
+            .clone()
+            .into_iter()
+            .filter(|entry| entry.contains(&self.search))
+            .collect::<Vec<_>>()
+    }
 }
 
 impl State for MenuState {
     fn init(&mut self, _registry: &mut Registry, ctx: &mut Context) {
-        MenuView::text_set(&mut ctx.widget(), "|");
+        self.items = WalkDir::new("/usr/bin")
+            .into_iter()
+            .filter_map(|entry| entry.ok())
+            .map(|entry| {
+                entry
+                    .path()
+                    .file_name()
+                    .unwrap()
+                    .to_str()
+                    .unwrap()
+                    .to_string()
+            })
+            .collect::<Vec<_>>();
+        self.search_entity = ctx.entity_of_child(SEARCH_ID).unwrap();
+        self.items_entity = ctx.entity_of_child(ITEMS_ID).unwrap();
+        self.render(ctx);
     }
     fn update(&mut self, _reg: &mut Registry, ctx: &mut Context) {
         if let Some(message) = &self.message {
@@ -32,53 +64,51 @@ impl State for MenuState {
                 Message::Key(key_event) => {
                     let key = key_event.key;
                     match key {
-                        Key::Backspace => { self.search.pop(); },
+                        Key::Backspace => {
+                            self.search.pop();
+                        }
                         Key::Escape => exit(0),
                         _ => self.search.push_str(&key.to_string()),
                     }
                 }
             };
-            MenuView::text_set(&mut ctx.widget(), format!("{}|", self.search));
             self.message = None;
+            self.render(ctx);
         }
     }
 }
 
-widget!(MenuView<MenuState>: ActivateHandler, KeyDownHandler { text: String });
+type List = Vec<String>;
+widget!(MenuView<MenuState>: ActivateHandler, KeyDownHandler { text: String, list: List });
 
 impl Template for MenuView {
     fn template(self, id: Entity, ctx: &mut BuildContext) -> Self {
-        let mut stack = Stack::new()
-            .orientation(Orientation::Horizontal)
-            .spacing(20);
-        for i in 0..5 {
-            stack = stack.child(
-                TextBlock::new()
-                    .text(format!("bruh {}", i))
-                    .font_size(FONT_SIZE)
+        self.name("Menu")
+            .child(
+                Stack::new()
+                    .orientation(Orientation::Horizontal)
+                    .spacing(FONT_SIZE)
+                    .child(
+                        TextBlock::new()
+                            .id(SEARCH_ID)
+                            .font_size(FONT_SIZE)
+                            .build(ctx),
+                    )
+                    .child(
+                        Stack::new()
+                            .id(ITEMS_ID)
+                            .orientation(Orientation::Horizontal)
+                            .spacing(20)
+                            .build(ctx),
+                    )
                     .build(ctx),
-            );
-        }
-        self.child(
-            Stack::new()
-                .orientation(Orientation::Horizontal)
-                .spacing(FONT_SIZE)
-                .child(
-                    TextBlock::new()
-                        .margin((10, 0, 500, 0))
-                        .text(id)
-                        .font_size(FONT_SIZE)
-                        .build(ctx),
-                )
-                .child(stack.build(ctx))
-                .build(ctx),
-        )
-        .on_key_down(move |states, event| -> bool {
-            states
-                .get_mut::<MenuState>(id)
-                .send_message(Message::Key(event));
-            false
-        })
+            )
+            .on_key_down(move |states, event| -> bool {
+                states
+                    .get_mut::<MenuState>(id)
+                    .send_message(Message::Key(event));
+                false
+            })
     }
 }
 
