@@ -1,0 +1,8 @@
+[package]
+name = "rmenu"
+version = "0.1.0"
+authors = ["Knarkzel <knarkzel@cock.li>"]
+edition = "2018"
+
+[dependencies]
+orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
