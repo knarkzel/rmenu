@@ -7,3 +7,12 @@ edition = "2018"
 [dependencies]
 orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
 walkdir = "2"
+pico-args = "0.4"
+atty = "0.2.14"
+
+[build-dependencies]
+man = { git = "https://github.com/Knarkzel/man", branch = "master" }
+
+[[bin]]
+name = "rmenu"
+path = "src/main.rs"
