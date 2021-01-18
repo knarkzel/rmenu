@@ -8,7 +8,7 @@ edition = "2018"
 orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
 walkdir = "2"
 pico-args = "0.4"
-atty = "0.2.14"
+atty = "0.2"
 
 [build-dependencies]
 man = { git = "https://github.com/Knarkzel/man", branch = "master" }

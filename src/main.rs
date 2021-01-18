@@ -30,6 +30,7 @@ impl MenuState {
 
 impl State for MenuState {
     fn init(&mut self, _registry: &mut Registry, ctx: &mut Context) {
+        ctx.switch_theme(theme_fluent_dark());
         ctx.widget()
             .set::<String>("text", format!("{}|", self.search));
     }
@@ -58,20 +59,24 @@ widget!(MenuView<MenuState>: KeyDownHandler { text: String });
 
 impl Template for MenuView {
     fn template(self, id: Entity, ctx: &mut BuildContext) -> Self {
-        self.name("Menu")
-            .child(
-                Stack::new()
-                    .orientation(Orientation::Horizontal)
-                    .spacing(FONT_SIZE)
-                    .child(TextBlock::new().text(id).font_size(FONT_SIZE).build(ctx))
-                    .build(ctx),
-            )
-            .on_key_down(move |states, event| -> bool {
-                states
-                    .get_mut::<MenuState>(id)
-                    .send_message(Message::Key(event));
-                false
-            })
+        self.child(
+            Stack::new()
+                .orientation(Orientation::Horizontal)
+                .child(
+                    TextBlock::new()
+                        .text(id)
+                        .font_size(FONT_SIZE)
+                        .offset(10)
+                        .build(ctx),
+                )
+                .build(ctx),
+        )
+        .on_key_down(move |states, event| -> bool {
+            states
+                .get_mut::<MenuState>(id)
+                .send_message(Message::Key(event));
+            false
+        })
     }
 }
 
