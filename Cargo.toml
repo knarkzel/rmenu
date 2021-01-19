@@ -22,7 +22,3 @@ man = { git = "https://github.com/Knarkzel/man", branch = "master" }
 [[bin]]
 name = "rmenu"
 path = "src/main.rs"
-
-[profile.release]
-lto = "fat"
-panic = "abort"
