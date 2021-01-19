@@ -11,11 +11,11 @@ use args::*;
 mod programs;
 use programs::*;
 
-const FONT_SIZE: f32 = 28.0;
-const WIDTH: f32 = 1920.0;
-const HEIGHT: f32 = FONT_SIZE + 6.0;
+const FONT_SIZE: f64 = 28.0;
+const WIDTH: f64 = 1920.0;
+const HEIGHT: f64 = FONT_SIZE + 6.0;
 //const SCREEN_WIDTH: f32 = 1920.0;
-const SCREEN_HEIGHT: f32 = 1080.0;
+const SCREEN_HEIGHT: f64 = 1080.0;
 const WRAP: usize = 10;
 
 enum Message {
@@ -163,18 +163,18 @@ widget!(MenuView<MenuState>: KeyDownHandler);
 
 impl Template for MenuView {
     fn template(self, id: Entity, ctx: &mut BuildContext) -> Self {
+        let spacing = 20;
         self.child(
             Stack::new()
                 .orientation(Orientation::Horizontal)
-                .spacing(10)
+                .spacing(spacing)
                 .child(Container::new().id("prompt").background("black").build(ctx))
                 .child(TextBlock::new().id("text").font_size(FONT_SIZE).build(ctx))
-                .spacing(FONT_SIZE)
                 .child(
                     Stack::new()
                         .id("stack")
                         .orientation(Orientation::Horizontal)
-                        .spacing(20)
+                        .spacing(spacing)
                         .build(ctx),
                 )
                 .build(ctx),
