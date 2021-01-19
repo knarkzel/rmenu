@@ -7,7 +7,6 @@ pub struct Args {
     pub receiving_stdin: bool,
     pub bottom_screen: bool,
     pub case_insensitive: bool,
-    pub lines: Option<u32>,
     pub prompt: Option<String>,
 }
 
@@ -24,7 +23,6 @@ impl Args {
             receiving_stdin: atty::isnt(atty::Stream::Stdin),
             bottom_screen: pargs.contains("-b"),
             case_insensitive: pargs.contains("-i"),
-            lines: pargs.opt_value_from_str("-l")?,
             prompt: pargs.opt_value_from_str("-p")?,
         };
         Ok(args)

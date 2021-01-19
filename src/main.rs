@@ -55,7 +55,7 @@ impl MenuState {
     fn render(&mut self, ctx: &mut Context) {
         // update search bar
         ctx.get_widget(self.search_entity)
-            .set::<String>("text", self.search.clone());
+            .set::<String>("text", format!("[ {} ]", self.search));
 
         // update candidates
         ctx.clear_children_of(self.stack_entity);
@@ -90,6 +90,7 @@ impl State for MenuState {
                 TextBlock::new()
                     .text(format!("   {}", prompt))
                     .margin((10, 0, 10, 0))
+                    .foreground("black")
                     .font_size(FONT_SIZE),
                 prompt_entity,
             )
@@ -168,7 +169,7 @@ impl Template for MenuView {
             Stack::new()
                 .orientation(Orientation::Horizontal)
                 .spacing(spacing)
-                .child(Container::new().id("prompt").background("black").build(ctx))
+                .child(Container::new().id("prompt").background("lightblue").build(ctx))
                 .child(TextBlock::new().id("text").font_size(FONT_SIZE).build(ctx))
                 .child(
                     Stack::new()
