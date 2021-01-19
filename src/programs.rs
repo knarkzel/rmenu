@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use walkdir::WalkDir;
 
+#[derive(Default)]
 pub struct Programs {
     pub paths: Vec<PathBuf>,
     pub binaries: Vec<String>,
