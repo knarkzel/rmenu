@@ -38,8 +38,7 @@ impl MenuState {
     }
     fn render(&mut self, ctx: &mut Context) {
         // update search bar
-        ctx.get_widget(self.search_entity)
-            .set::<String>("text", format!("{}|", self.search));
+        ctx.get_widget(self.search_entity).set::<String>("text", self.search.clone());
 
         // update candidates
         ctx.clear_children_of(self.stack_entity);
@@ -48,11 +47,12 @@ impl MenuState {
             let textblock = if self.cursor as usize == i {
                 TextBlock::new()
                     .text(candidate.to_string())
-                    .enabled(true)
-                    .font_size(FONT_SIZE + 4.)
+                    .foreground("lightblue")
+                    .font_size(FONT_SIZE)
             } else {
                 TextBlock::new()
                     .text(candidate.to_string())
+                    .opacity(0.5)
                     .font_size(FONT_SIZE)
             };
             ctx.append_child_to(textblock, self.stack_entity);
