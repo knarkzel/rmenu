@@ -24,12 +24,6 @@ fn main() {
         )
         .flag(
             Flag::new()
-                .short("-f")
-                .help("rmenu grabs the keyboard before reading stdin if not reading from a tty. \
-                        This is faster, but will lock up Redox until stdin reaches end-of-file."),
-        )
-        .flag(
-            Flag::new()
                 .short("-i")
                 .help("rmenu matches menu items case insensitively."),
         )

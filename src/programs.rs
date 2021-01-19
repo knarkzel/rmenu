@@ -15,7 +15,7 @@ impl Programs {
             .split(':')
             .map(|entry| PathBuf::from(entry))
             .collect::<Vec<_>>();
-        paths.sort();
+        paths.sort_unstable();
         paths.dedup();
 
         // obtain unique binaries
@@ -36,7 +36,9 @@ impl Programs {
                 .collect::<Vec<_>>();
             temp_binaries.push(temp);
         }
-        let binaries = temp_binaries.into_iter().flatten().collect::<Vec<_>>();
+        let mut binaries = temp_binaries.into_iter().flatten().collect::<Vec<_>>();
+        binaries.sort_unstable();
+        binaries.dedup();
 
         Self { paths, binaries }
     }

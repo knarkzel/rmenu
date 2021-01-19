@@ -4,8 +4,8 @@ use orbtk::{
 };
 use std::{process::exit, process::Command};
 
-// mod args;
-// use args::*;
+mod args;
+use args::*;
 
 mod programs;
 use programs::*;
@@ -13,6 +13,8 @@ use programs::*;
 const FONT_SIZE: f32 = 28.0;
 const WIDTH: f32 = 1920.0;
 const HEIGHT: f32 = FONT_SIZE + 6.0;
+const SCREEN_WIDTH: f32 = 1920.0;
+const SCREEN_HEIGHT: f32 = 1080.0;
 const WRAP: usize = 10;
 
 enum Message {
@@ -96,8 +98,8 @@ impl State for MenuState {
                                 Command::new(program)
                                     .spawn()
                                     .expect(&format!("Failed to execute {}", program));
-                                exit(0);
                             }
+                            exit(0);
                         }
                         Key::Backspace => {
                             self.search.pop();
@@ -151,9 +153,19 @@ impl Template for MenuView {
 fn main() {
     Application::new()
         .window(|ctx| {
+            // args stuff
+            let args = Args::new().unwrap_or(Args::default());
+            let position_x: f64 = 0.0;
+            let position_y: f64 = if args.bottom_screen {
+                (SCREEN_HEIGHT - HEIGHT) as f64
+            } else {
+                0.0
+            };
+
+            // window and ctx
             Window::new()
                 .title("rmenu")
-                .position((0.0, 0.0))
+                .position((position_x, position_y))
                 .size(WIDTH, HEIGHT)
                 .child(MenuView::new().build(ctx))
                 .build(ctx)
