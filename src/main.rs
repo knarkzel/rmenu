@@ -1,6 +1,8 @@
-use orbtk::prelude::*;
-use orbtk::shell::prelude::{Key, KeyEvent};
-use std::process::exit;
+use orbtk::{
+    prelude::*,
+    shell::prelude::{Key, KeyEvent},
+};
+use std::{process::exit, process::Command};
 
 // mod args;
 // use args::*;
@@ -85,6 +87,16 @@ impl State for MenuState {
                                 if self.cursor < 0 {
                                     self.cursor = self.current_len as isize - 1;
                                 }
+                            }
+                        }
+                        Key::Enter => {
+                            let programs = self.programs.get_filtered_matches(&self.search);
+                            let program = programs.get(self.cursor as usize);
+                            if let Some(program) = program {
+                                Command::new(program)
+                                    .spawn()
+                                    .expect(&format!("Failed to execute {}", program));
+                                exit(0);
                             }
                         }
                         Key::Backspace => {
