@@ -42,10 +42,4 @@ impl Programs {
 
         Self { paths, binaries }
     }
-    pub fn get_filtered_matches(&self, search: &str) -> Vec<&String> {
-        self.binaries
-            .iter()
-            .filter(|entry| entry.contains(search))
-            .collect::<Vec<_>>()
-    }
 }

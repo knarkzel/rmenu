@@ -2,7 +2,7 @@ const HELP: &str = "\
 usage: rmenu [-bfi] [-l lines] [-p prompt]
 ";
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct Args {
     pub receiving_stdin: bool,
     pub bottom_screen: bool,
@@ -21,7 +21,7 @@ impl Args {
         }
 
         let args = Args {
-            receiving_stdin: atty::is(atty::Stream::Stdin),
+            receiving_stdin: atty::isnt(atty::Stream::Stdin),
             bottom_screen: pargs.contains("-b"),
             case_insensitive: pargs.contains("-i"),
             lines: pargs.opt_value_from_str("-l")?,
