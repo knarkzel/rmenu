@@ -1,8 +1,14 @@
 [package]
 name = "rmenu"
 version = "0.1.0"
-authors = ["Knarkzel <knarkzel@cock.li>"]
+authors = ["Knarkzel <knarkzel@knarkzel.xyz>"]
 edition = "2018"
+license = "GPL v2"
+readme = "README.md"
+description = "dmenu in Rust, made for Redox"
+repository = "https://gitlab.com/knarkzel/rmenu"
+keywords = ["dmenu", "rust", "redox"]
+categories = ["redox"]
 
 [dependencies]
 orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
