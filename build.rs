@@ -32,6 +32,16 @@ fn main() {
                 .short("-p")
                 .help("defines the prompt to be displayed to the left of the input field."),
         )
+        .custom(
+            Section::new("Keybindings")
+                .paragraph("Left        move cursor left")
+                .paragraph("Right       move cursor right")
+                .paragraph("Enter       open/print selection")
+                .paragraph("Backspace   delete character")
+                .paragraph("C-u         delete line left")
+                .paragraph("C-C         exit rmenu")
+                .paragraph("Escape      exit rmenu")
+                )
         .example(
             Example::new()
                 .command("rmenu")

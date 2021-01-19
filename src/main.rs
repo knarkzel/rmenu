@@ -114,42 +114,55 @@ impl State for MenuState {
             match message {
                 Message::Key(key_event) => {
                     let key = key_event.key;
-                    match key {
-                        Key::Escape => exit(0),
-                        Key::Right => {
-                            if self.current_len > 0 {
-                                self.cursor = (self.cursor + 1) % self.current_len as isize;
-                            }
+                    if ctx
+                        .window()
+                        .get::<KeyboardState>("keyboard_state")
+                        .is_ctrl_down()
+                    {
+                        // ctrl keybinds
+                        match key {
+                            Key::U(_) => self.search = String::new(),
+                            Key::C(_) => exit(0),
+                            _ => (),
                         }
-                        Key::Left => {
-                            if self.current_len > 0 {
-                                self.cursor -= 1;
-                                if self.cursor < 0 {
-                                    self.cursor = self.current_len as isize - 1;
+                    } else {
+                        match key {
+                            Key::Escape => exit(0),
+                            Key::Right => {
+                                if self.current_len > 0 {
+                                    self.cursor = (self.cursor + 1) % self.current_len as isize;
                                 }
                             }
-                        }
-                        Key::Enter => {
-                            let matches = self.get_filtered_matches(&self.search);
-                            let candidate = matches.get(self.cursor as usize);
+                            Key::Left => {
+                                if self.current_len > 0 {
+                                    self.cursor -= 1;
+                                    if self.cursor < 0 {
+                                        self.cursor = self.current_len as isize - 1;
+                                    }
+                                }
+                            }
+                            Key::Enter => {
+                                let matches = self.get_filtered_matches(&self.search);
+                                let candidate = matches.get(self.cursor as usize);
 
-                            if let Some(candidate) = candidate {
-                                if self.args.receiving_stdin {
-                                    // print it
-                                    println!("{}", candidate);
-                                } else {
-                                    // execute it
-                                    Command::new(candidate).spawn().unwrap();
+                                if let Some(candidate) = candidate {
+                                    if self.args.receiving_stdin {
+                                        // print it
+                                        println!("{}", candidate);
+                                    } else {
+                                        // execute it
+                                        Command::new(candidate).spawn().unwrap();
+                                    }
                                 }
+                                exit(0);
                             }
-                            exit(0);
-                        }
-                        Key::Backspace => {
-                            self.search.pop();
-                        }
-                        _ => {
-                            self.search.push_str(&key.to_string());
-                            self.cursor = 0;
+                            Key::Backspace => {
+                                self.search.pop();
+                            }
+                            _ => {
+                                self.search.push_str(&key.to_string());
+                                self.cursor = 0;
+                            }
                         }
                     }
                 }
@@ -169,7 +182,12 @@ impl Template for MenuView {
             Stack::new()
                 .orientation(Orientation::Horizontal)
                 .spacing(spacing)
-                .child(Container::new().id("prompt").background("lightblue").build(ctx))
+                .child(
+                    Container::new()
+                        .id("prompt")
+                        .background("lightblue")
+                        .build(ctx),
+                )
                 .child(TextBlock::new().id("text").font_size(FONT_SIZE).build(ctx))
                 .child(
                     Stack::new()
