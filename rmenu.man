@@ -4,7 +4,7 @@ rmenu \- dmenu in rust
 .SH SYNOPSIS
 \fBrmenu\fR [FLAGS] [OPTIONS]
 .SH DESCRIPTION
-rmenu is a dynamic menu implemented for Redox, which reads a list of newline\-separated items from stdin. When the user selects an item and presses Return, their choice is printed to stdout and rmenu terminates. Entering text will narrow the items to those matching the tokens in the input. Default behaviour is to list programs in the user's $PATH and run the result in $SHELL, unless  user pipes in input.
+rmenu is dmenu implemented for Redox, which reads a list of newline\-separated items from stdin. When the user selects an item and presses Return, their choice is printed to stdout and rmenu terminates. Entering text will narrow the items to those matching the tokens in the input. Default behaviour is to list programs in the user's $PATH and run the result in $SHELL, unless  user pipes in input.
 .SH FLAGS
 .TP
 \fB\-b\fR
@@ -14,10 +14,6 @@ rmenu appears at the bottom of the screen.
 \fB\-i\fR
 rmenu matches menu items case insensitively.
 .SH OPTIONS
-.TP
-\fB\-l\fR=\fIlines\fR
-rmenu lists items vertically, with the given number of lines.
-
 .TP
 \fB\-p\fR=\fIprompt\fR
 defines the prompt to be displayed to the left of the input field.
@@ -29,9 +25,9 @@ defines the prompt to be displayed to the left of the input field.
 Grants user a selection of programs in $PATH. When result is selected with Enter, program will run.
 .TP
 
-\fB$ echo "option 1\\noption2\\n option3" | rmenu \-l 3\fR
+\fB$ echo "option 1\\noption2\\n option3" | rmenu \-p "Which option would you like?"\fR
 .br
-Opens a menu from piped input seperated by newlines, displaying options vertically.
+Opens a menu from piped input seperated by newlines, displaying a prompt.
 
 .SH AUTHOR
 .P
