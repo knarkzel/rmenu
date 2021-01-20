@@ -11,11 +11,7 @@ use args::*;
 mod programs;
 use programs::*;
 
-const FONT_SIZE: f64 = 28.0;
-const WIDTH: f64 = 1920.0;
-const HEIGHT: f64 = FONT_SIZE + 6.0;
-//const SCREEN_WIDTH: f32 = 1920.0;
-const SCREEN_HEIGHT: f64 = 1080.0;
+const FONT_SIZE: f64 = 28.;
 const WRAP: usize = 10;
 
 enum Message {
@@ -210,12 +206,21 @@ impl Template for MenuView {
 fn main() {
     Application::new()
         .window(|ctx| {
+            // get display information, assumes monitor 0
+            let sdl_context = sdl2::init().unwrap();
+            let video_subsystem = sdl_context.video().unwrap();
+            let (screen_width, screen_height) = {
+                let mode = video_subsystem.current_display_mode(0).unwrap();
+                (mode.w as f64, mode.h as f64)
+            };
+            let height = FONT_SIZE + 6.;
+
             // args stuff
             let args = Args::new().unwrap_or(Args::default());
-            let position_y: f64 = if args.bottom_screen {
-                (SCREEN_HEIGHT - HEIGHT) as f64
+            let position_y = if args.bottom_screen {
+                screen_height - height
             } else {
-                0.0
+                0.
             };
 
             let mut menuview = MenuView::new();
@@ -224,8 +229,8 @@ fn main() {
             // window and ctx
             Window::new()
                 .title("rmenu")
-                .size(WIDTH, HEIGHT)
-                .position((0.0, position_y))
+                .size(screen_width, height)
+                .position((0., position_y))
                 .child(menuview.build(ctx))
                 .build(ctx)
         })

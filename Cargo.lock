@@ -860,6 +860,7 @@ dependencies = [
  "man",
  "orbtk",
  "pico-args",
+ "sdl2",
  "walkdir",
 ]
 
