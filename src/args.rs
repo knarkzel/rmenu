@@ -1,5 +1,5 @@
 const HELP: &str = "\
-usage: rmenu [-bfi] [-l lines] [-p prompt]
+usage: rmenu [-bfi] [-p prompt]
 ";
 
 #[derive(Debug, Default, Clone, PartialEq)]

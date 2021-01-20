@@ -1,9 +1,9 @@
 use orbtk::{
     prelude::*,
-    shell::prelude::{Key, KeyEvent},
+    shell::prelude::{Key, KeyEvent, WindowRequest},
 };
 use std::io::{self, Read};
-use std::{process::exit, process::Command};
+use std::process::Command;
 
 mod args;
 use args::*;
@@ -122,12 +122,12 @@ impl State for MenuState {
                         // ctrl keybinds
                         match key {
                             Key::U(_) => self.search = String::new(),
-                            Key::C(_) => exit(0),
+                            Key::C(_) => { ctx.send_window_request(WindowRequest::Close); },
                             _ => (),
                         }
                     } else {
                         match key {
-                            Key::Escape => exit(0),
+                            Key::Escape => { ctx.send_window_request(WindowRequest::Close); },
                             Key::Right => {
                                 if self.current_len > 0 {
                                     self.cursor = (self.cursor + 1) % self.current_len as isize;
@@ -154,7 +154,7 @@ impl State for MenuState {
                                         Command::new(candidate).spawn().unwrap();
                                     }
                                 }
-                                exit(0);
+                                ctx.send_window_request(WindowRequest::Close);
                             }
                             Key::Backspace => {
                                 self.search.pop();
@@ -212,7 +212,6 @@ fn main() {
         .window(|ctx| {
             // args stuff
             let args = Args::new().unwrap_or(Args::default());
-            let position_x: f64 = 0.0;
             let position_y: f64 = if args.bottom_screen {
                 (SCREEN_HEIGHT - HEIGHT) as f64
             } else {
@@ -225,8 +224,8 @@ fn main() {
             // window and ctx
             Window::new()
                 .title("rmenu")
-                .position((position_x, position_y))
                 .size(WIDTH, HEIGHT)
+                .position((0.0, position_y))
                 .child(menuview.build(ctx))
                 .build(ctx)
         })
