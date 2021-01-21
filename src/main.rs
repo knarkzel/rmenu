@@ -147,8 +147,10 @@ impl State for MenuState {
                                         println!("{}", candidate);
                                     } else {
                                         // execute it
-                                        Command::new(candidate).spawn().unwrap();
+                                        Command::new(candidate).spawn().expect(&format!("Failed to execute {}", candidate));
                                     }
+                                } else {
+                                    Command::new(&self.search).spawn().expect(&format!("Failed to execute {}", &self.search));
                                 }
                                 ctx.send_window_request(WindowRequest::Close);
                             }
