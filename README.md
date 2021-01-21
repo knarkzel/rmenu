@@ -9,3 +9,5 @@ To install, run the following command:
 ```rust
 cargo install --git https://gitlab.com/knarkzel/rmenu
 ```
+
+For more on `rmenu`, see [ruckless.xyz](https://ruckless.xyz/pages/rmenu.html).
