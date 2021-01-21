@@ -858,9 +858,9 @@ version = "0.1.0"
 dependencies = [
  "atty",
  "man",
+ "orbclient",
  "orbtk",
  "pico-args",
- "sdl2",
  "walkdir",
 ]
 

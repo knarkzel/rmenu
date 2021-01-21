@@ -207,12 +207,9 @@ fn main() {
     Application::new()
         .window(|ctx| {
             // get display information, assumes monitor 0
-            let sdl_context = sdl2::init().unwrap();
-            let video_subsystem = sdl_context.video().unwrap();
-            let (screen_width, screen_height) = {
-                let mode = video_subsystem.current_display_mode(0).unwrap();
-                (mode.w as f64, mode.h as f64)
-            };
+            let size = orbclient::get_display_size().unwrap(); 
+            let (screen_width, screen_height) = (size.0 as f64, size.1 as f64);
+
             let height = FONT_SIZE + 6.;
 
             // args stuff
