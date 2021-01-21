@@ -6,10 +6,7 @@ use std::io::{self, Read};
 use std::process::Command;
 
 mod args;
-use args::*;
-
 mod programs;
-use programs::*;
 
 const FONT_SIZE: f64 = 28.;
 const WRAP: usize = 10;
@@ -20,7 +17,7 @@ enum Message {
 
 #[derive(Default, AsAny)]
 struct MenuState {
-    args: Args,
+    args: args::Args,
     search: String,
     message: Option<Message>,
     candidates: Vec<String>,
@@ -99,7 +96,7 @@ impl State for MenuState {
             buffer.lines().map(|s| s.to_string()).collect::<Vec<_>>()
         } else {
             // default behaviour is get programs
-            Programs::new().binaries
+            programs::get_programs()
         };
 
         ctx.switch_theme(theme_fluent_dark());
@@ -118,12 +115,16 @@ impl State for MenuState {
                         // ctrl keybinds
                         match key {
                             Key::U(_) => self.search = String::new(),
-                            Key::C(_) => { ctx.send_window_request(WindowRequest::Close); },
+                            Key::C(_) => {
+                                ctx.send_window_request(WindowRequest::Close);
+                            }
                             _ => (),
                         }
                     } else {
                         match key {
-                            Key::Escape => { ctx.send_window_request(WindowRequest::Close); },
+                            Key::Escape => {
+                                ctx.send_window_request(WindowRequest::Close);
+                            }
                             Key::Right => {
                                 if self.current_len > 0 {
                                     self.cursor = (self.cursor + 1) % self.current_len as isize;
@@ -147,10 +148,19 @@ impl State for MenuState {
                                         println!("{}", candidate);
                                     } else {
                                         // execute it
-                                        Command::new(candidate).spawn().expect(&format!("Failed to execute {}", candidate));
+                                        Command::new(candidate)
+                                            .spawn()
+                                            .expect(&format!("Failed to execute {}", candidate));
                                     }
                                 } else {
-                                    Command::new(&self.search).spawn().expect(&format!("Failed to execute {}", &self.search));
+                                    // turn into regular command with args then run
+                                    let mut args = self.search.split(" ");
+                                    let command = args.next().unwrap();
+                                    let rest_args = args.collect::<Vec<_>>();
+                                    Command::new(command)
+                                        .args(rest_args)
+                                        .spawn()
+                                        .expect(&format!("Failed to execute {}", &self.search));
                                 }
                                 ctx.send_window_request(WindowRequest::Close);
                             }
@@ -209,13 +219,13 @@ fn main() {
     Application::new()
         .window(|ctx| {
             // get display information, assumes monitor 0
-            let size = orbclient::get_display_size().unwrap(); 
+            let size = orbclient::get_display_size().unwrap();
             let (screen_width, screen_height) = (size.0 as f64, size.1 as f64);
 
             let height = FONT_SIZE + 6.;
 
             // args stuff
-            let args = Args::new().unwrap_or(Args::default());
+            let args = args::Args::new().expect("Failed to get args");
             let position_y = if args.bottom_screen {
                 screen_height - height
             } else {

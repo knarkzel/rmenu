@@ -16,6 +16,7 @@ orbclient = { git = "https://gitlab.redox-os.org/redox-os/orbclient", branch = "
 walkdir = "2"
 pico-args = "0.4"
 atty = "0.2"
+itertools = "0.10.0"
 
 [build-dependencies]
 man = { git = "https://github.com/Knarkzel/man", branch = "master" }
