@@ -9,18 +9,14 @@ mod args;
 mod programs;
 
 const FONT_SIZE: f64 = 28.;
-const WRAP: usize = 10;
-
-enum Message {
-    Key(KeyEvent),
-}
+const MENU_CANDIDATES: usize = 10;
 
 #[derive(Default, AsAny)]
 struct MenuState {
     args: args::Args,
     search: String,
-    message: Option<Message>,
     candidates: Vec<String>,
+    current_key: Option<KeyEvent>,
     current_len: usize,
     cursor: isize,
     search_entity: Entity,
@@ -28,8 +24,8 @@ struct MenuState {
 }
 
 impl MenuState {
-    fn send_message(&mut self, message: Message) {
-        self.message = Some(message);
+    fn set_current_key(&mut self, key: KeyEvent) {
+        self.current_key = Some(key);
     }
     fn get_filtered_matches(&self, search: &str) -> Vec<&String> {
         // TODO: Make this better
@@ -53,7 +49,7 @@ impl MenuState {
         // update candidates
         ctx.clear_children_of(self.stack_entity);
         let filtered_candidates = self.get_filtered_matches(&self.search);
-        for (i, candidate) in filtered_candidates.iter().take(WRAP).enumerate() {
+        for (i, candidate) in filtered_candidates.iter().take(MENU_CANDIDATES).enumerate() {
             let textblock = if self.cursor as usize == i {
                 TextBlock::new()
                     .text(candidate.to_string())
@@ -68,7 +64,11 @@ impl MenuState {
             ctx.append_child_to(textblock, self.stack_entity);
         }
         let len = filtered_candidates.len();
-        self.current_len = if len > WRAP { WRAP } else { len };
+        self.current_len = if len > MENU_CANDIDATES {
+            MENU_CANDIDATES
+        } else {
+            len
+        };
     }
 }
 
@@ -103,79 +103,75 @@ impl State for MenuState {
         self.render(ctx);
     }
     fn update(&mut self, _reg: &mut Registry, ctx: &mut Context) {
-        if let Some(message) = &self.message {
-            match message {
-                Message::Key(key_event) => {
-                    let key = key_event.key;
-                    if ctx
-                        .window()
-                        .get::<KeyboardState>("keyboard_state")
-                        .is_ctrl_down()
-                    {
-                        // ctrl keybinds
-                        match key {
-                            Key::U(_) => self.search = String::new(),
-                            Key::C(_) => {
-                                ctx.send_window_request(WindowRequest::Close);
-                            }
-                            _ => (),
+        if let Some(key_event) = &self.current_key {
+            let key = key_event.key;
+            if ctx
+                .window()
+                .get::<KeyboardState>("keyboard_state")
+                .is_ctrl_down()
+            {
+                // ctrl keybinds
+                match key {
+                    Key::U(_) => self.search = String::new(),
+                    Key::C(_) => {
+                        ctx.send_window_request(WindowRequest::Close);
+                    }
+                    _ => (),
+                }
+            } else {
+                match key {
+                    Key::Escape => {
+                        ctx.send_window_request(WindowRequest::Close);
+                    }
+                    Key::Right => {
+                        if self.current_len > 0 {
+                            self.cursor = (self.cursor + 1) % self.current_len as isize;
                         }
-                    } else {
-                        match key {
-                            Key::Escape => {
-                                ctx.send_window_request(WindowRequest::Close);
-                            }
-                            Key::Right => {
-                                if self.current_len > 0 {
-                                    self.cursor = (self.cursor + 1) % self.current_len as isize;
-                                }
-                            }
-                            Key::Left => {
-                                if self.current_len > 0 {
-                                    self.cursor -= 1;
-                                    if self.cursor < 0 {
-                                        self.cursor = self.current_len as isize - 1;
-                                    }
-                                }
-                            }
-                            Key::Enter => {
-                                let matches = self.get_filtered_matches(&self.search);
-                                let candidate = matches.get(self.cursor as usize);
-
-                                if let Some(candidate) = candidate {
-                                    if self.args.receiving_stdin {
-                                        // print it
-                                        println!("{}", candidate);
-                                    } else {
-                                        // execute it
-                                        Command::new(candidate)
-                                            .spawn()
-                                            .expect(&format!("Failed to execute {}", candidate));
-                                    }
-                                } else {
-                                    // turn into regular command with args then run
-                                    let mut args = self.search.split(" ");
-                                    let command = args.next().unwrap();
-                                    let rest_args = args.collect::<Vec<_>>();
-                                    Command::new(command)
-                                        .args(rest_args)
-                                        .spawn()
-                                        .expect(&format!("Failed to execute {}", &self.search));
-                                }
-                                ctx.send_window_request(WindowRequest::Close);
-                            }
-                            Key::Backspace => {
-                                self.search.pop();
-                            }
-                            _ => {
-                                self.search.push_str(&key.to_string());
-                                self.cursor = 0;
+                    }
+                    Key::Left => {
+                        if self.current_len > 0 {
+                            self.cursor -= 1;
+                            if self.cursor < 0 {
+                                self.cursor = self.current_len as isize - 1;
                             }
                         }
                     }
+                    Key::Enter => {
+                        let matches = self.get_filtered_matches(&self.search);
+                        let candidate = matches.get(self.cursor as usize);
+
+                        if let Some(candidate) = candidate {
+                            if self.args.receiving_stdin {
+                                // print it
+                                println!("{}", candidate);
+                            } else {
+                                // execute it
+                                Command::new(candidate)
+                                    .spawn()
+                                    .expect(&format!("Failed to execute {}", candidate));
+                            }
+                        } else {
+                            // turn into regular command with args then run
+                            let mut args = self.search.split(" ");
+                            let command = args.next().unwrap();
+                            let rest_args = args.collect::<Vec<_>>();
+                            Command::new(command)
+                                .args(rest_args)
+                                .spawn()
+                                .expect(&format!("Failed to execute {}", &self.search));
+                        }
+                        ctx.send_window_request(WindowRequest::Close);
+                    }
+                    Key::Backspace => {
+                        self.search.pop();
+                    }
+                    _ => {
+                        self.search.push_str(&key.to_string());
+                        self.cursor = 0;
+                    }
                 }
-            };
-            self.message = None;
+            }
+            self.current_key = None;
             self.render(ctx);
         }
     }
@@ -206,10 +202,8 @@ impl Template for MenuView {
                 )
                 .build(ctx),
         )
-        .on_key_down(move |states, event| -> bool {
-            states
-                .get_mut::<MenuState>(id)
-                .send_message(Message::Key(event));
+        .on_key_down(move |states, key_event| -> bool {
+            states.get_mut::<MenuState>(id).set_current_key(key_event);
             false
         })
     }
