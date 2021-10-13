@@ -1,25 +1,23 @@
 [package]
 name = "rmenu"
 version = "0.1.0"
-authors = ["Knarkzel <knarkzel@knarkzel.xyz>"]
+authors = ["Knarkzel <knarkzel@gmail.com>"]
 edition = "2018"
 license = "GPL v2"
 readme = "README.md"
 description = "dmenu in Rust, made for Redox"
 repository = "https://gitlab.com/knarkzel/rmenu"
 keywords = ["dmenu", "rust", "redox"]
-categories = ["redox"]
 
 [dependencies]
-orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
-orbclient = { git = "https://gitlab.redox-os.org/redox-os/orbclient", branch = "master" }
+# orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
+# orbclient = { git = "https://gitlab.redox-os.org/redox-os/orbclient", branch = "master" }
 walkdir = "2"
 pico-args = "0.4"
 atty = "0.2"
 itertools = "0.10.0"
-
-[build-dependencies]
-man = { git = "https://github.com/Knarkzel/man", branch = "master" }
+orbtk = "0.2.31"
+orbclient = "0.3.31"
 
 [[bin]]
 name = "rmenu"
