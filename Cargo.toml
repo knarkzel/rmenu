@@ -10,13 +10,13 @@ repository = "https://gitlab.com/knarkzel/rmenu"
 keywords = ["dmenu", "rust", "redox"]
 
 [dependencies]
-# orbtk = { git = "https://github.com/redox-os/orbtk.git", branch = "develop" }
-# orbclient = { git = "https://gitlab.redox-os.org/redox-os/orbclient", branch = "master" }
+# orbtk = { git = "https://github.com/redox-os/orbtk.git", rev = "bc94174", branch = "develop" }
+# orbclient = { git = "https://gitlab.redox-os.org/redox-os/orbclient", branch = "master"  }
 walkdir = "2"
 pico-args = "0.4"
 atty = "0.2"
 itertools = "0.10.0"
-orbtk = "0.2.31"
+orbtk = "0.3.1-alpha1"
 orbclient = "0.3.31"
 
 [[bin]]

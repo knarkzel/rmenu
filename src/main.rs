@@ -2,6 +2,7 @@ use orbtk::{
     prelude::*,
     shell::prelude::{Key, KeyEvent, WindowRequest},
 };
+
 use std::io::{self, Read};
 use std::process::Command;
 
@@ -11,7 +12,7 @@ mod programs;
 const FONT_SIZE: f64 = 28.;
 const MENU_CANDIDATES: usize = 10;
 
-#[derive(Default, AsAny)]
+#[derive(Default)]
 struct MenuState {
     args: args::Args,
     search: String,
